@@ -94,10 +94,10 @@
 
 **Independent Test**: Fill steps 2-4, move between steps repeatedly, edit from step 5, and confirm updates persist.
 
-- [ ] T031 [US3] Add forward-step guard logic based on required step data in `src/stores/checkoutStore.ts`
-- [ ] T032 [US3] Refine conditional button behavior by step state in `src/components/checkout/StepNavigation.tsx`
-- [ ] T033 [US3] Add review edit-link navigation to specific steps in `src/components/checkout/ReviewOrder.tsx`
-- [ ] T034 [US3] Persist each form section on change via store actions in `src/components/checkout/PersonalInfoForm.tsx`, `src/components/checkout/AddressForm.tsx`, `src/components/checkout/PaymentForm.tsx`
+- [X] T031 [US3] Add forward-step guard logic based on required step data in `src/stores/checkoutStore.ts`
+- [X] T032 [US3] Refine conditional button behavior by step state in `src/components/checkout/StepNavigation.tsx`
+- [X] T033 [US3] Add review edit-link navigation to specific steps in `src/components/checkout/ReviewOrder.tsx`
+- [X] T034 [US3] Persist each form section on change via store actions in `src/components/checkout/PersonalInfoForm.tsx`, `src/components/checkout/AddressForm.tsx`, `src/components/checkout/PaymentForm.tsx`
 
 **Checkpoint**: Navigation and edit loop is stable and user-friendly.
 

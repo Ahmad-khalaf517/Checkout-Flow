@@ -37,6 +37,9 @@ export interface StateOption {
 const COUNTRY_OPTIONS: CountryOption[] = [
   { code: "US", name: "United States" },
   { code: "CA", name: "Canada" },
+  { code: "LE", name: "Lebanon" },
+  { code: "SY", name: "Syria" },
+  { code: "JO", name: "Jordan" },
 ]
 
 const STATE_OPTIONS: Record<string, StateOption[]> = {
@@ -49,6 +52,21 @@ const STATE_OPTIONS: Record<string, StateOption[]> = {
     { code: "ON", name: "Ontario" },
     { code: "QC", name: "Quebec" },
     { code: "BC", name: "British Columbia" },
+  ],
+  LE: [
+    { code: "BE", name: "Beirut" },
+    { code: "SA", name: "Saida" },
+    { code: "TR", name: "Tripoli" },
+  ],
+  SY: [
+    { code: "DM", name: "Damascus" },
+    { code: "AL", name: "Aleppo" },
+    { code: "HM", name: "Homs" },
+  ],
+  JO: [
+    { code: "AM", name: "Amman" },
+    { code: "IR", name: "Irbid" },
+    { code: "AQ", name: "Aqaba" },
   ],
 }
 

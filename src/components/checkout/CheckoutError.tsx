@@ -5,7 +5,7 @@ export function CheckoutError() {
   const { submitError, orderId, goToStep, clearError } = useCheckout()
 
   return (
-    <section className="rounded-2xl border border-destructive/40 bg-card p-6 shadow-sm">
+    <section className="rounded-2xl border border-destructive/40 bg-card p-6 shadow-sm animate-checkout-error-in" role="alert" aria-live="assertive">
       <h2 className="text-xl font-semibold text-destructive">Unable to place order</h2>
       <p className="mt-2 text-sm text-muted-foreground">{submitError ?? "Please review your details and try again."}</p>
       {orderId ? (

@@ -14,25 +14,33 @@ export function StepNavigation({ step, isSubmitting = false, onBack, onNext, onP
     return null
   }
 
+  const showBack = step >= 2 && step <= 5
+  const showContinue = step >= 1 && step <= 4
+  const showPlaceOrder = step === 5
+
+  const continueLabel = step === 4 ? "Review Order" : "Continue"
+
   return (
     <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
       <div>
-        {step > 1 ? (
+        {showBack ? (
           <Button type="button" variant="outline" className="min-h-12 w-full sm:w-auto" onClick={onBack}>
             Back
           </Button>
         ) : null}
       </div>
 
-      {step === 5 ? (
+      {showPlaceOrder ? (
         <Button type="button" className="min-h-12 w-full sm:w-auto" disabled={isSubmitting} onClick={onPlaceOrder}>
           {isSubmitting ? "Placing order..." : "Place Order"}
         </Button>
-      ) : (
+      ) : null}
+
+      {showContinue ? (
         <Button type="button" className="min-h-12 w-full sm:w-auto" onClick={onNext}>
-          {step === 1 ? "Continue" : "Continue"}
+          {continueLabel}
         </Button>
-      )}
+      ) : null}
     </div>
   )
 }

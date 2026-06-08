@@ -132,3 +132,45 @@
     @apply font-sans;
     }
 }
+
+@layer utilities {
+  @keyframes checkout-toast-in {
+    from {
+      opacity: 0;
+      transform: translateY(-0.5rem) scale(0.98);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes checkout-error-in {
+    0% {
+      opacity: 0;
+      transform: translateY(0.5rem) scale(0.98);
+    }
+
+    45% {
+      transform: translateX(-0.35rem) scale(1.01);
+    }
+
+    70% {
+      transform: translateX(0.2rem) scale(1);
+    }
+
+    100% {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+    }
+  }
+
+  .animate-checkout-toast-in {
+    animation: checkout-toast-in 180ms ease-out;
+  }
+
+  .animate-checkout-error-in {
+    animation: checkout-error-in 260ms ease-out;
+  }
+}
