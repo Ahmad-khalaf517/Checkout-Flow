@@ -24,6 +24,10 @@ export function ReviewOrder() {
 
   const safeShipping = useShippingAsBilling ? billingAddress : shippingAddress
 
+  const editPersonalInfo = () => goToStep(2)
+  const editAddress = () => goToStep(3)
+  const editPayment = () => goToStep(4)
+
   return (
     <section aria-live="polite" className="rounded-2xl border border-border bg-card p-6 shadow-sm">
       <h2 className="text-xl font-semibold">Review Order</h2>
@@ -33,7 +37,7 @@ export function ReviewOrder() {
         <div className="rounded-xl bg-muted/30 p-4">
           <div className="flex items-center justify-between">
             <h3 className="font-semibold">Personal info</h3>
-            <Button variant="link" size="sm" type="button" onClick={() => goToStep(2)}>
+            <Button variant="link" size="sm" type="button" onClick={editPersonalInfo} aria-label="Edit personal information">
               Edit
             </Button>
           </div>
@@ -45,7 +49,7 @@ export function ReviewOrder() {
         <div className="rounded-xl bg-muted/30 p-4">
           <div className="flex items-center justify-between">
             <h3 className="font-semibold">Billing address</h3>
-            <Button variant="link" size="sm" type="button" onClick={() => goToStep(3)}>
+            <Button variant="link" size="sm" type="button" onClick={editAddress} aria-label="Edit billing address">
               Edit
             </Button>
           </div>
@@ -58,7 +62,7 @@ export function ReviewOrder() {
         <div className="rounded-xl bg-muted/30 p-4">
           <div className="flex items-center justify-between">
             <h3 className="font-semibold">Shipping address</h3>
-            <Button variant="link" size="sm" type="button" onClick={() => goToStep(3)}>
+            <Button variant="link" size="sm" type="button" onClick={editAddress} aria-label="Edit shipping address">
               Edit
             </Button>
           </div>
@@ -77,7 +81,7 @@ export function ReviewOrder() {
         <div className="rounded-xl bg-muted/30 p-4">
           <div className="flex items-center justify-between">
             <h3 className="font-semibold">Payment</h3>
-            <Button variant="link" size="sm" type="button" onClick={() => goToStep(4)}>
+            <Button variant="link" size="sm" type="button" onClick={editPayment} aria-label="Edit payment details">
               Edit
             </Button>
           </div>

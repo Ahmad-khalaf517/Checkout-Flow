@@ -1,6 +1,6 @@
 import { create } from "zustand"
 
-import { CheckoutSchema } from "@/lib/validation"
+import { AddressSchema, CheckoutSchema, PaymentMethodSchema, PersonalInfoSchema } from "@/lib/validation"
 import { submitCheckout } from "@/services/payment"
 import type { AddressData, CartItem, CheckoutSession, CheckoutStep, PaymentMethodData, PersonalInfoData } from "@/types"
 
@@ -30,6 +30,40 @@ const initialSession = (): CheckoutSession => ({
   sessionId: crypto.randomUUID(),
 })
 
+function canMoveForward(state: CheckoutSession, targetStep: CheckoutStep): boolean {
+  if (targetStep <= state.currentStep) {
+    return true
+  }
+
+  switch (state.currentStep) {
+    case 1:
+      return true
+    case 2:
+      return state.personalInfo ? PersonalInfoSchema.safeParse(state.personalInfo).success : false
+    case 3: {
+      const billingValid = state.billingAddress ? AddressSchema.safeParse(state.billingAddress).success : false
+      const shippingAddress = state.useShippingAsBilling ? state.billingAddress : state.shippingAddress
+      const shippingValid = shippingAddress ? AddressSchema.safeParse(shippingAddress).success : false
+      return billingValid && shippingValid
+    }
+    case 4:
+      return state.paymentMethod
+        ? PaymentMethodSchema.safeParse({
+            cardholderName: state.paymentMethod.cardholderName,
+            cardNumber: state.paymentMethod.cardNumber ?? "",
+            expiryDate: state.paymentMethod.expiryDate,
+            cvv: state.paymentMethod.cvv ?? "",
+          }).success
+        : false
+    case 5:
+      return true
+    case 6:
+      return false
+    default:
+      return false
+  }
+}
+
 export interface CheckoutStore extends CheckoutSession {
   goToStep: (step: CheckoutStep) => void
   updatePersonalInfo: (value: PersonalInfoData) => void
@@ -47,6 +81,13 @@ export interface CheckoutStore extends CheckoutSession {
 export const useCheckoutStore = create<CheckoutStore>((set, get) => ({
   ...initialSession(),
   goToStep: (step) => {
+    const state = get()
+
+    if (step > state.currentStep && !canMoveForward(state, step)) {
+      set({ submitError: "Please complete all required fields in this step before continuing." })
+      return
+    }
+
     set({ currentStep: step, submitError: null })
   },
   updatePersonalInfo: (value) => set({ personalInfo: value }),

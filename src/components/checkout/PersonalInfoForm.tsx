@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useEffect } from "react"
 import { useForm } from "react-hook-form"
 
 import { FormError } from "@/components/checkout/FormError"
@@ -17,7 +16,6 @@ export function PersonalInfoForm() {
     register,
     handleSubmit,
     formState: { errors },
-    reset,
   } = useForm<PersonalInfoSchemaData>({
     resolver: zodResolver(PersonalInfoSchema),
     mode: "onBlur",
@@ -28,12 +26,6 @@ export function PersonalInfoForm() {
       phoneNumber: "",
     },
   })
-
-  useEffect(() => {
-    if (personalInfo) {
-      reset(personalInfo)
-    }
-  }, [personalInfo, reset])
 
   const onSubmit = (data: PersonalInfoSchemaData) => {
     updatePersonalInfo(data)

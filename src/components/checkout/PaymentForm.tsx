@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useEffect } from "react"
 import { useForm, useWatch } from "react-hook-form"
 
 import { FormError } from "@/components/checkout/FormError"
@@ -50,7 +49,6 @@ export function PaymentForm() {
     register,
     handleSubmit,
     setValue,
-    reset,
     control,
     formState: { errors },
   } = useForm<PaymentMethodSchemaData>({
@@ -64,17 +62,6 @@ export function PaymentForm() {
       cvv: paymentMethod?.cvv ?? "",
     },
   })
-
-  useEffect(() => {
-    if (paymentMethod) {
-      reset({
-        cardholderName: paymentMethod.cardholderName,
-        cardNumber: paymentMethod.cardNumber ?? "",
-        expiryDate: paymentMethod.expiryDate,
-        cvv: paymentMethod.cvv ?? "",
-      })
-    }
-  }, [paymentMethod, reset])
 
   const cardNumberValue = useWatch({ control, name: "cardNumber" })
   const expiryDateValue = useWatch({ control, name: "expiryDate" })

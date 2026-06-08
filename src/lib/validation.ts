@@ -57,38 +57,44 @@ export function isValidExpiryDate(value: string): boolean {
 export const PersonalInfoSchema = z.object({
   fullName: z
     .string()
-    .min(2)
-    .max(100)
+    .min(2, "Full name must be at least 2 characters long")
+    .max(100, "Full name must be 100 characters or fewer")
     .regex(FULL_NAME_REGEX, "Full name can only contain letters, spaces, hyphens, and apostrophes"),
-  email: z.email().max(255),
+  email: z.string().email("Enter a valid email address").max(255, "Email must be 255 characters or fewer"),
   phoneNumber: z
     .string()
     .regex(/^\d{10,15}$/, "Phone number must be 10-15 digits"),
 })
 
 export const AddressSchema = z.object({
-  streetAddress: z.string().min(5).max(100),
+  streetAddress: z
+    .string()
+    .min(5, "Street address must be at least 5 characters long")
+    .max(100, "Street address must be 100 characters or fewer"),
   city: z
     .string()
-    .min(2)
-    .max(50)
+    .min(2, "City must be at least 2 characters long")
+    .max(50, "City must be 50 characters or fewer")
     .regex(CITY_REGEX, "City name can only contain letters, spaces, hyphens, and apostrophes"),
-  state: z.string().min(2).max(3),
-  postalCode: z.string().min(3).max(20),
-  country: z.string().length(2),
+  state: z.string().min(2, "State or region is required").max(3, "State or region code is too long"),
+  postalCode: z.string().min(3, "Postal code is required").max(20, "Postal code is too long"),
+  country: z.string().length(2, "Please choose a country"),
 })
 
 export const PaymentMethodSchema = z.object({
-  cardholderName: z.string().min(2).max(100),
+  cardholderName: z
+    .string()
+    .min(2, "Cardholder name must be at least 2 characters long")
+    .max(100, "Cardholder name must be 100 characters or fewer"),
   cardNumber: z
     .string()
     .regex(/^\d{13,19}$/, "Card number must be 13-19 digits")
     .refine(luhnCheck, "Invalid card number"),
   expiryDate: z
     .string()
-    .regex(/^\d{2}\/\d{2}$/)
+    .regex(/^\d{2}\/\d{2}$/, "Enter expiry as MM/YY")
     .refine(isValidExpiryDate, "Card has expired or expiry date is invalid"),
-  cvv: z.string().regex(/^\d{3,4}$/),
+  cvv: z.string().regex(/^\d{3,4}$/, "CVV must be 3 or 4 digits"),
 })
 
 export const CheckoutSchema = z.object({
