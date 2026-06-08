@@ -1,6 +1,7 @@
 import { create } from "zustand"
 
 import { CheckoutSchema } from "@/lib/validation"
+import { submitCheckout } from "@/services/payment"
 import type { AddressData, CartItem, CheckoutSession, CheckoutStep, PaymentMethodData, PersonalInfoData } from "@/types"
 
 const initialCartItems: CartItem[] = [
@@ -99,9 +100,25 @@ export const useCheckoutStore = create<CheckoutStore>((set, get) => ({
     set({ isLoadingSubmit: true, orderStatus: "processing", submitError: null })
 
     try {
+      const response = await submitCheckout(
+        {
+          personalInfo: state.personalInfo,
+          billingAddress: state.billingAddress,
+          shippingAddress,
+          paymentMethod: state.paymentMethod,
+          cartItems: state.cartItems,
+          cartTotal: state.cartTotal,
+        },
+        state.sessionId
+      )
+
+      if (!response.success || !response.order) {
+        throw new Error(response.error?.message ?? "Unable to submit order")
+      }
+
       set({
         isLoadingSubmit: false,
-        orderId: crypto.randomUUID(),
+        orderId: response.order.orderId,
         orderStatus: "success",
         currentStep: 6,
       })
