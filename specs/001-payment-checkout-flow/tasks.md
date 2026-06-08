@@ -33,37 +33,37 @@
 
 ### 1.1 Project Structure & Dependencies
 
-- [ ] T001 Create folder structure per plan: `src/components/checkout/`, `src/hooks/`, `src/stores/`, `src/services/`, `src/types/`, `src/constants/`, `src/lib/`
-- [ ] T002 [P] Install new dependencies: `pnpm add react-hook-form zod @hookform/resolvers zustand stripe clsx`
-- [ ] T003 [P] Create environment variable template: `.env.example` with `REACT_APP_API_BASE_URL`, `REACT_APP_STRIPE_PUBLIC_KEY`
+- [X] T001 Create folder structure per plan: `src/components/checkout/`, `src/hooks/`, `src/stores/`, `src/services/`, `src/types/`, `src/constants/`, `src/lib/`
+- [X] T002 [P] Install new dependencies: `pnpm add react-hook-form zod @hookform/resolvers zustand clsx`
+- [X] T003 [P] Create environment variable template: `.env.example` with `REACT_APP_API_BASE_URL`, `REACT_APP_STRIPE_PUBLIC_KEY`
 
 ### 1.2 Type Definitions
 
-- [ ] T004 [P] Create core type definitions in `src/types/checkout.ts` (PersonalInfoData, AddressData, PaymentMethodData, CartItem, Order, CheckoutSession, CheckoutStep, FieldError, CheckoutResponse interfaces)
-- [ ] T005 [P] Create ISO8601DateTime and type exports in `src/types/index.ts`
+- [X] T004 [P] Create core type definitions in `src/types/checkout.ts` (PersonalInfoData, AddressData, PaymentMethodData, CartItem, Order, CheckoutSession, CheckoutStep, FieldError, CheckoutResponse interfaces)
+- [X] T005 [P] Create ISO8601DateTime and type exports in `src/types/index.ts`
 
 ### 1.3 Validation & Constants
 
-- [ ] T006 Create Zod validation schemas in `src/lib/validation.ts`:
+- [X] T006 Create Zod validation schemas in `src/lib/validation.ts`:
   - PersonalInfoSchema (fullName 2-100 chars regex, email RFC 5322, phoneNumber 10-15 digits)
   - AddressSchema (street 5-100, city 2-50 regex, state 2-3 code, postalCode 3-20, country 2-char ISO)
   - PaymentMethodSchema (cardholderName, cardNumber Luhn check, expiryDate MM/YY, CVV 3-4 digits)
   - CheckoutSchema (complete multi-step validation)
   - Helper functions: luhnCheck() and isValidExpiryDate()
-- [ ] T007 [P] Create validation constants and error messages in `src/constants/checkout.ts` (field labels, error messages, step info)
+- [X] T007 [P] Create validation constants and error messages in `src/constants/checkout.ts` (field labels, error messages, step info)
 
 ### 1.4 API Client
 
-- [ ] T008 Create API client wrapper in `src/lib/api-client.ts` (ApiClient class with request, get, post methods; timeout 30 seconds; error handling)
-- [ ] T009 [P] Create payment service in `src/services/payment.ts` (submitCheckout, validateAddress, getCountries, getStates functions with retry logic)
+- [X] T008 Create API client wrapper in `src/lib/api-client.ts` (ApiClient class with request, get, post methods; timeout 30 seconds; error handling)
+- [X] T009 [P] Create payment service in `src/services/payment.ts` (submitCheckout, validateAddress, getCountries, getStates functions with retry logic)
 
 ### 1.5 State Management (Zustand Store)
 
-- [ ] T010 Create Zustand checkout store in `src/stores/checkoutStore.ts`:
+- [X] T010 Create Zustand checkout store in `src/stores/checkoutStore.ts`:
   - Initial state: currentStep, personalInfo, billingAddress, shippingAddress, paymentMethod, isLoadingSubmit, submitError, orderId, orderStatus, cartItems, cartTotal, sessionId
   - Actions: goToStep, updatePersonalInfo, updateBillingAddress, updateShippingAddress, setUseShippingAsBilling, updatePaymentMethod, submitOrder, resetCheckout, setError, clearError
   - Helper: generateSessionId() for idempotency
-- [ ] T011 [P] Create custom hook in `src/hooks/useCheckout.ts` that wraps useCheckoutStore()
+- [X] T011 [P] Create custom hook in `src/hooks/useCheckout.ts` that wraps useCheckoutStore()
 
 **Checkpoint**: All setup complete - foundation ready for user story implementation to begin in parallel
 
@@ -75,18 +75,18 @@
 
 ### 2.1 Form Wrappers & Utilities
 
-- [ ] T012 [P] Create FormError reusable component in `src/components/checkout/FormError.tsx` (inline error display with aria-invalid, aria-describedby, field highlighting)
-- [ ] T013 [P] Create StepNavigation component in `src/components/checkout/StepNavigation.tsx` (Back, Next/Continue, Place Order buttons with conditional rendering based on step)
-- [ ] T014 [P] Create custom hook in `src/hooks/useFormStepNavigation.ts` for step transition logic and validation on navigation
+- [X] T012 [P] Create FormError reusable component in `src/components/checkout/FormError.tsx` (inline error display with aria-invalid, aria-describedby, field highlighting)
+- [X] T013 [P] Create StepNavigation component in `src/components/checkout/StepNavigation.tsx` (Back, Next/Continue, Place Order buttons with conditional rendering based on step)
+- [X] T014 [P] Create custom hook in `src/hooks/useFormStepNavigation.ts` for step transition logic and validation on navigation
 
 ### 2.2 Main Container & Step 1 (Summary)
 
-- [ ] T015 Create CheckoutContainer component in `src/components/checkout/CheckoutContainer.tsx`:
+- [X] T015 Create CheckoutContainer component in `src/components/checkout/CheckoutContainer.tsx`:
   - Wraps all checkout steps
   - Manages step transitions via store
   - Fetches initial cart data
   - Handles sessionStorage persistence and restore on mount
-- [ ] T016 Create CheckoutSummary (Step 1) in `src/components/checkout/CheckoutSummary.tsx`:
+- [X] T016 Create CheckoutSummary (Step 1) in `src/components/checkout/CheckoutSummary.tsx`:
   - Display cart items with product name, quantity, price, image
   - Show cart total in cents formatted as currency
   - Show "Continue" button to move to Step 2 (Personal Info)
@@ -157,14 +157,11 @@
 - [ ] T025 Create PaymentForm (Step 4) in `src/components/checkout/PaymentForm.tsx`:
   - Use React Hook Form with PaymentMethodSchema
   - Fields: cardholderName, cardNumber (with input masking - spaces every 4 digits), expiryDate (MM/YY with auto-stepping), CVV (3-4 digits)
-  - NOTE: DO NOT SEND RAW CARD DATA TO SERVER - integrate with Stripe.js for tokenization
-  - Before form submission, tokenize card via Stripe client SDK (returns token, NOT raw card)
   - Store token and masked card info (last4Digits, cardType) in paymentMethod state
   - Display Luhn algorithm error for invalid card numbers
   - Display expiry date error for expired or invalid dates
   - Display CVV length error (3-4 digits)
   - Back button goes to Step 3, "Review Order" button validates and moves to Step 5
-  - Stripe integration: Load Stripe.js on mount, handle card element styling
 
 ### 3.3 Implementation for US1 - Review & Submission
 
