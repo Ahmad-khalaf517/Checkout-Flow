@@ -1,15 +1,22 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm, useWatch } from "react-hook-form"
-
+import { CreditCard, Sparkles } from "lucide-react"
 import { FormError } from "@/components/checkout/FormError"
 import { Button } from "@/components/ui/button"
 import { useCheckout } from "@/hooks/useCheckout"
-import { PaymentMethodSchema, type PaymentMethodSchemaData } from "@/lib/validation"
+import {
+  PaymentMethodSchema,
+  type PaymentMethodSchemaData,
+} from "@/lib/validation"
+import { TooltipContent, TooltipTrigger, Tooltip } from "../ui/tooltip"
+import { generateLuhnId } from "@/lib/utils"
 
 const fieldClassName =
   "mt-1 h-12 w-full rounded-xl border border-input bg-background px-3 text-base outline-none focus-visible:ring-2 focus-visible:ring-ring"
 
-function detectCardType(cardNumber: string): "visa" | "mastercard" | "amex" | "discover" | "unknown" {
+function detectCardType(
+  cardNumber: string
+): "visa" | "mastercard" | "amex" | "discover" | "unknown" {
   if (/^4/.test(cardNumber)) {
     return "visa"
   }
@@ -84,11 +91,21 @@ export function PaymentForm() {
   }
 
   return (
-    <section role="region" aria-label="Payment details" className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+    <section
+      role="region"
+      aria-label="Payment details"
+      className="rounded-2xl border border-border bg-card p-6 shadow-sm"
+    >
       <h2 className="text-xl font-semibold">Payment</h2>
-      <p className="mt-1 text-sm text-muted-foreground">Enter card details to continue to review.</p>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Enter card details to continue to review.
+      </p>
 
-      <form className="mt-6 space-y-4" onSubmit={handleSubmit(onSubmit)} noValidate>
+      <form
+        className="mt-6 space-y-4"
+        onSubmit={handleSubmit(onSubmit)}
+        noValidate
+      >
         <div>
           <label htmlFor="cardholderName" className="text-sm font-medium">
             Cardholder name
@@ -97,13 +114,18 @@ export function PaymentForm() {
             id="cardholderName"
             className={fieldClassName}
             aria-invalid={errors.cardholderName ? "true" : "false"}
-            aria-describedby={errors.cardholderName ? "cardholderName-error" : undefined}
+            aria-describedby={
+              errors.cardholderName ? "cardholderName-error" : undefined
+            }
             {...register("cardholderName")}
           />
-          <FormError id="cardholderName-error" message={errors.cardholderName?.message} />
+          <FormError
+            id="cardholderName-error"
+            message={errors.cardholderName?.message}
+          />
         </div>
 
-        <div>
+        <div className="flex items-center justify-between gap-2">
           <label htmlFor="cardNumber" className="text-sm font-medium">
             Card number
           </label>
@@ -112,16 +134,47 @@ export function PaymentForm() {
             inputMode="numeric"
             className={fieldClassName}
             aria-invalid={errors.cardNumber ? "true" : "false"}
-            aria-describedby={errors.cardNumber ? "cardNumber-error" : undefined}
+            aria-describedby={
+              errors.cardNumber ? "cardNumber-error" : undefined
+            }
             value={maskCardNumber(cardNumberValue ?? "")}
             onChange={(event) => {
-              setValue("cardNumber", normalizeCardNumber(event.target.value), { shouldValidate: true })
+              setValue("cardNumber", normalizeCardNumber(event.target.value), {
+                shouldValidate: true,
+              })
             }}
             onBlur={() => {
-              setValue("cardNumber", normalizeCardNumber(cardNumberValue ?? ""), { shouldValidate: true, shouldTouch: true })
+              setValue(
+                "cardNumber",
+                normalizeCardNumber(cardNumberValue ?? ""),
+                { shouldValidate: true, shouldTouch: true }
+              )
             }}
           />
-          <FormError id="cardNumber-error" message={errors.cardNumber?.message} />
+          <Tooltip>
+            <TooltipTrigger>
+              <Button
+                onClick={() => {
+                  const generatedCard = generateLuhnId(16)
+                  setValue("cardNumber", generatedCard, { shouldValidate: true, shouldTouch: true })
+                }}
+                type="button"
+                variant="outline"
+              >
+                <CreditCard className="h-4 w-4" /> Generate 
+              <Sparkles className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              Generate a valid card number{" "}
+            </TooltipContent>
+          </Tooltip>
+          <FormError
+            id="cardNumber-error"
+            message={errors.cardNumber?.message}
+
+          />
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
@@ -133,16 +186,26 @@ export function PaymentForm() {
               id="expiryDate"
               className={fieldClassName}
               aria-invalid={errors.expiryDate ? "true" : "false"}
-              aria-describedby={errors.expiryDate ? "expiryDate-error" : undefined}
+              aria-describedby={
+                errors.expiryDate ? "expiryDate-error" : undefined
+              }
               value={expiryDateValue ?? ""}
               onChange={(event) => {
-                setValue("expiryDate", formatExpiry(event.target.value), { shouldValidate: true })
+                setValue("expiryDate", formatExpiry(event.target.value), {
+                  shouldValidate: true,
+                })
               }}
               onBlur={() => {
-                setValue("expiryDate", formatExpiry(expiryDateValue ?? ""), { shouldValidate: true, shouldTouch: true })
+                setValue("expiryDate", formatExpiry(expiryDateValue ?? ""), {
+                  shouldValidate: true,
+                  shouldTouch: true,
+                })
               }}
             />
-            <FormError id="expiryDate-error" message={errors.expiryDate?.message} />
+            <FormError
+              id="expiryDate-error"
+              message={errors.expiryDate?.message}
+            />
           </div>
           <div>
             <label htmlFor="cvv" className="text-sm font-medium">
@@ -161,7 +224,12 @@ export function PaymentForm() {
         </div>
 
         <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-between">
-          <Button type="button" variant="outline" className="min-h-12 w-full sm:w-auto" onClick={() => goToStep(3)}>
+          <Button
+            type="button"
+            variant="outline"
+            className="min-h-12 w-full sm:w-auto"
+            onClick={() => goToStep(3)}
+          >
             Back
           </Button>
           <Button type="submit" className="min-h-12 w-full sm:w-auto">
