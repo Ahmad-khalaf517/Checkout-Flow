@@ -126,7 +126,7 @@ export function PaymentForm() {
         </div>
 
         <div className="flex items-center justify-between gap-2">
-          <label htmlFor="cardNumber" className="text-sm font-medium">
+          <label htmlFor="cardNumber" className="text-sm font-medium whitespace-nowrap">
             Card number
           </label>
           <input
@@ -160,9 +160,10 @@ export function PaymentForm() {
                 }}
                 type="button"
                 variant="outline"
+                className="h-12 px-2 mt-1 bg-amber-400 text-white"
               >
-                <CreditCard className="h-4 w-4" /> Generate 
-              <Sparkles className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                <CreditCard className="h-4 w-4 text-blue-900" /> Generate 
+              <Sparkles className="h-3.5 w-3.5 fill-amber-400 text-blue-900" />
 
               </Button>
             </TooltipTrigger>
