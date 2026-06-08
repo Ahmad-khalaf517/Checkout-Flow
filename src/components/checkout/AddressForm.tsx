@@ -19,14 +19,14 @@ const fieldClassName =
 
 interface AddressFormValues {
   billingAddress: AddressSchemaData
-  shippingAddress: AddressSchemaData
+  shippingAddress?: AddressSchemaData
   useShippingAsBilling: boolean
 }
 
 const AddressFormSchema = z
   .object({
     billingAddress: AddressSchema,
-    shippingAddress: AddressSchema,
+    shippingAddress: AddressSchema.optional(),
     useShippingAsBilling: z.boolean(),
   })
   .superRefine((value, context) => {
@@ -81,13 +81,13 @@ export function AddressForm() {
     reValidateMode: "onChange",
     defaultValues: {
       billingAddress: billingAddress ?? emptyAddress,
-      shippingAddress: shippingAddress ?? emptyAddress,
+      shippingAddress: shippingAddress ?? undefined,
       useShippingAsBilling,
     },
   })
 
   const billingCountry = useWatch({ control, name: "billingAddress.country" })
-  const shippingCountry = useWatch({ control, name: "shippingAddress.country" })
+  const shippingCountry = useWatch({ control, name: "shippingAddress.country" }) || '';
   const sameAsBilling = useWatch({ control, name: "useShippingAsBilling" })
 
   useEffect(() => {
@@ -127,7 +127,7 @@ export function AddressForm() {
     if (data.useShippingAsBilling) {
       updateShippingAddress(data.billingAddress)
     } else {
-      updateShippingAddress(data.shippingAddress)
+      updateShippingAddress(data.shippingAddress ?? emptyAddress)
     }
     goToStep(4)
   }
