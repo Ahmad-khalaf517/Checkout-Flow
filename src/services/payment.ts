@@ -1,78 +1,120 @@
-// import { apiClient } from "@/lib/api-client"
-// import type { AddressData, CheckoutResponse, PaymentMethodData, PersonalInfoData } from "@/types"
+import { CheckoutSchema } from "@/lib/validation"
+import type { AddressData, CartItem, PaymentMethodData, PersonalInfoData } from "@/types"
 
-// export interface SubmitCheckoutPayload {
-//   personalInfo: PersonalInfoData
-//   billingAddress: AddressData
-//   shippingAddress: AddressData
-//   paymentMethod: PaymentMethodData
-//   cartItems: Array<{ id: string; name: string; quantity: number; price: number; image?: string }>
-//   cartTotal: number
-// }
+export interface SubmitCheckoutPayload {
+  personalInfo: PersonalInfoData
+  billingAddress: AddressData
+  shippingAddress: AddressData
+  paymentMethod: PaymentMethodData
+  cartItems: CartItem[]
+  cartTotal: number
+}
 
-// export interface CountryOption {
-//   code: string
-//   name: string
-// }
+export interface CheckoutResponse {
+  success: boolean
+  order?: {
+    orderId: string
+    status: "completed"
+    createdAt: string
+  }
+  error?: {
+    code: string
+    message: string
+    details?: Record<string, string>
+  }
+}
 
-// export interface StateOption {
-//   code: string
-//   name: string
-// }
+export interface CountryOption {
+  code: string
+  name: string
+}
 
-// const RETRY_DELAYS_MS = [1000, 2000, 4000]
+export interface StateOption {
+  code: string
+  name: string
+}
 
-// function isRetryableError(error: unknown): boolean {
-//   if (!(error instanceof Error)) {
-//     return false
-//   }
+const COUNTRY_OPTIONS: CountryOption[] = [
+  { code: "US", name: "United States" },
+  { code: "CA", name: "Canada" },
+]
 
-//   const message = error.message.toLowerCase()
-//   return message.includes("timeout") || message.includes("network") || message.includes("failed")
-// }
+const STATE_OPTIONS: Record<string, StateOption[]> = {
+  US: [
+    { code: "CA", name: "California" },
+    { code: "NY", name: "New York" },
+    { code: "TX", name: "Texas" },
+  ],
+  CA: [
+    { code: "ON", name: "Ontario" },
+    { code: "QC", name: "Quebec" },
+    { code: "BC", name: "British Columbia" },
+  ],
+}
 
-// async function withRetries<T>(operation: () => Promise<T>): Promise<T> {
-//   let lastError: unknown = null
+function buildValidationError(details: Record<string, string>): CheckoutResponse {
+  return {
+    success: false,
+    error: {
+      code: "VALIDATION_ERROR",
+      message: "Validation failed for one or more fields.",
+      details,
+    },
+  }
+}
 
-//   for (let index = 0; index <= RETRY_DELAYS_MS.length; index += 1) {
-//     try {
-//       return await operation()
-//     } catch (error) {
-//       lastError = error
-//       if (!isRetryableError(error) || index === RETRY_DELAYS_MS.length) {
-//         break
-//       }
-//       const delay = RETRY_DELAYS_MS[index]
-//       await new Promise((resolve) => setTimeout(resolve, delay))
-//     }
-//   }
+export async function submitCheckout(
+  payload: SubmitCheckoutPayload,
+  idempotencyKey: string
+): Promise<CheckoutResponse> {
+  const parsed = CheckoutSchema.safeParse({
+    ...payload,
+    paymentMethod: {
+      ...payload.paymentMethod,
+      cardNumber: payload.paymentMethod.cardNumber ?? "",
+      cvv: payload.paymentMethod.cvv ?? "",
+    },
+  })
 
-//   throw lastError
-// }
+  if (!parsed.success) {
+    const details: Record<string, string> = {}
+    parsed.error.issues.forEach((issue) => {
+      details[issue.path.join(".")] = issue.message
+    })
+    return buildValidationError(details)
+  }
 
-// export async function submitCheckout(
-//   payload: SubmitCheckoutPayload,
-//   idempotencyKey: string
-// ): Promise<CheckoutResponse> {
-//   return withRetries(() =>
-//     apiClient.post<CheckoutResponse>("/api/orders/submit", payload, {
-//       headers: {
-//         "Idempotency-Key": idempotencyKey,
-//       },
-//     })
-//   )
-// }
+  await new Promise((resolve) => setTimeout(resolve, 300))
 
-// export async function validateAddress(address: AddressData): Promise<{ valid: boolean; message?: string }> {
-//   return withRetries(() => apiClient.post<{ valid: boolean; message?: string }>("/api/addresses/validate", address))
-// }
+  return {
+    success: true,
+    order: {
+      orderId: `ORD-${idempotencyKey.slice(0, 8).toUpperCase()}`,
+      status: "completed",
+      createdAt: new Date().toISOString(),
+    },
+  }
+}
 
-// export async function getCountries(): Promise<CountryOption[]> {
-//   const response = await apiClient.get<{ success: boolean; data: CountryOption[] }>("/api/geo/countries")
-//   return response.data
-// }
+export async function validateAddress(address: AddressData): Promise<{ valid: boolean; message?: string }> {
+  const valid =
+    address.streetAddress.trim().length >= 5 &&
+    address.city.trim().length >= 2 &&
+    address.state.trim().length >= 2 &&
+    address.postalCode.trim().length >= 3 &&
+    address.country.trim().length === 2
 
-// export async function getStates(countryCode: string): Promise<StateOption[]> {
-//   const response = await apiClient.get<{ success: boolean; data: StateOption[] }>(`/api/geo/states/${countryCode}`)
-//   return response.data
-// }
+  if (valid) {
+    return { valid: true }
+  }
+
+  return { valid: false, message: "Address is incomplete or invalid." }
+}
+
+export async function getCountries(): Promise<CountryOption[]> {
+  return COUNTRY_OPTIONS
+}
+
+export async function getStates(countryCode: string): Promise<StateOption[]> {
+  return STATE_OPTIONS[countryCode] ?? []
+}

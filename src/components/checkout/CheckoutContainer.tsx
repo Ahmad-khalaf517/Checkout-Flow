@@ -1,22 +1,17 @@
 import { useEffect, useMemo } from "react"
 
+import { AddressForm } from "@/components/checkout/AddressForm"
+import { CheckoutError } from "@/components/checkout/CheckoutError"
 import { CheckoutSummary } from "@/components/checkout/CheckoutSummary"
-import { StepNavigation } from "@/components/checkout/StepNavigation"
+import { CheckoutSuccess } from "@/components/checkout/CheckoutSuccess"
+import { PaymentForm } from "@/components/checkout/PaymentForm"
+import { PersonalInfoForm } from "@/components/checkout/PersonalInfoForm"
+import { ReviewOrder } from "@/components/checkout/ReviewOrder"
 import { useCheckout } from "@/hooks/useCheckout"
-import { useFormStepNavigation } from "@/hooks/useFormStepNavigation"
 import { CHECKOUT_STEPS } from "@/constants/checkout"
 
 const CHECKOUT_STORAGE_KEY = "checkout-flow-session"
 const CHECKOUT_SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 30
-
-function PlaceholderStep({ title }: { title: string }) {
-  return (
-    <section className="rounded-2xl border border-dashed border-border bg-card p-6">
-      <h2 className="text-xl font-semibold">{title}</h2>
-      <p className="mt-2 text-sm text-muted-foreground">This step foundation is ready and can now be implemented in detail.</p>
-    </section>
-  )
-}
 
 export function CheckoutContainer() {
   const {
@@ -24,19 +19,14 @@ export function CheckoutContainer() {
     cartItems,
     cartTotal,
     orderStatus,
-    submitError,
-    isLoadingSubmit,
-    goToStep,
-    submitOrder,
+    personalInfo,
+    billingAddress,
+    shippingAddress,
+    paymentMethod,
+    useShippingAsBilling,
     restoreSession,
+    goToStep,
   } = useCheckout()
-
-  const { goBack, goNext, canGoBack } = useFormStepNavigation({
-    currentStep,
-    maxStep: 5,
-    onBack: (step) => goToStep(step),
-    onNext: (step) => goToStep(step),
-  })
 
   useEffect(() => {
     try {
@@ -68,11 +58,25 @@ export function CheckoutContainer() {
         currentStep,
         cartItems,
         cartTotal,
+        personalInfo,
+        billingAddress,
+        shippingAddress,
+        paymentMethod,
+        useShippingAsBilling,
       },
     }
 
     sessionStorage.setItem(CHECKOUT_STORAGE_KEY, JSON.stringify(payload))
-  }, [cartItems, cartTotal, currentStep])
+  }, [
+    billingAddress,
+    cartItems,
+    cartTotal,
+    currentStep,
+    paymentMethod,
+    personalInfo,
+    shippingAddress,
+    useShippingAsBilling,
+  ])
 
   const stepLabel = useMemo(() => CHECKOUT_STEPS.find((step) => step.step === currentStep)?.title ?? "Checkout", [currentStep])
 
@@ -84,29 +88,12 @@ export function CheckoutContainer() {
           <h1 className="mt-1 text-2xl font-semibold">{stepLabel}</h1>
         </header>
 
-        {currentStep === 1 ? <CheckoutSummary items={cartItems} total={cartTotal} onContinue={goNext} /> : null}
-        {currentStep === 2 ? <PlaceholderStep title="Personal Information" /> : null}
-        {currentStep === 3 ? <PlaceholderStep title="Address" /> : null}
-        {currentStep === 4 ? <PlaceholderStep title="Payment" /> : null}
-        {currentStep === 5 ? <PlaceholderStep title="Review Order" /> : null}
-        {currentStep === 6 ? (
-          <section className="rounded-2xl border border-border bg-card p-6">
-            <h2 className="text-xl font-semibold">{orderStatus === "success" ? "Order Confirmed" : "Order Failed"}</h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {orderStatus === "success"
-                ? "Your order was placed successfully."
-                : submitError ?? "We were unable to process this order."}
-            </p>
-          </section>
-        ) : null}
-
-        <StepNavigation
-          step={currentStep}
-          isSubmitting={isLoadingSubmit}
-          onBack={canGoBack ? goBack : undefined}
-          onNext={goNext}
-          onPlaceOrder={submitOrder}
-        />
+        {currentStep === 1 ? <CheckoutSummary items={cartItems} total={cartTotal} onContinue={() => goToStep(2)} /> : null}
+        {currentStep === 2 ? <PersonalInfoForm /> : null}
+        {currentStep === 3 ? <AddressForm /> : null}
+        {currentStep === 4 ? <PaymentForm /> : null}
+        {currentStep === 5 ? <ReviewOrder /> : null}
+        {currentStep === 6 ? (orderStatus === "success" ? <CheckoutSuccess /> : <CheckoutError />) : null}
       </div>
     </main>
   )
