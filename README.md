@@ -59,8 +59,3 @@ Then open the local URL shown in the terminal, usually `http://localhost:5173`.
 
 - The checkout flow is frontend-only and does not call external backend services.
 - Validation, success, and error handling are all handled locally.
-- Checkout progress is stored in browser session storage so users can resume within the same session.
-
-## Contributing
-
-If you add new checkout components or flows, keep the state updates and validation rules aligned with the local store and schema definitions in `src/`.
