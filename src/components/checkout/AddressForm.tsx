@@ -89,7 +89,6 @@ export function AddressForm() {
       resolver: zodResolver(AddressFormSchema),
       mode: "onSubmit",
       reValidateMode: "onChange",
-      shouldUnregister: true,
       defaultValues: {
         billingAddress: billingAddress ?? emptyAddress,
         shippingAddress: shippingAddress || undefined,
