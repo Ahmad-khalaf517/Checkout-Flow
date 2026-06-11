@@ -1,21 +1,28 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-
-import { FormError } from "@/components/checkout/FormError"
+import { Controller, useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
-import { PersonalInfoSchema, type PersonalInfoSchemaData } from "@/lib/validation"
+import {
+  PersonalInfoSchema,
+  type PersonalInfoSchemaData,
+} from "@/lib/validation"
 import { useCheckout } from "@/hooks/useCheckout"
-
-const fieldClassName =
-  "mt-1 h-12 w-full rounded-xl border border-input bg-background px-3 text-base outline-none focus-visible:ring-2 focus-visible:ring-ring"
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldLegend,
+  FieldSet,
+} from "../ui/field"
+import { Input } from "../ui/input"
 
 export function PersonalInfoForm() {
   const { personalInfo, updatePersonalInfo, goToStep } = useCheckout()
 
   const {
-    register,
     handleSubmit,
-    formState: { errors },
+    control,
   } = useForm<PersonalInfoSchemaData>({
     resolver: zodResolver(PersonalInfoSchema),
     mode: "onBlur",
@@ -33,57 +40,97 @@ export function PersonalInfoForm() {
   }
 
   return (
-    <section role="region" aria-label="Personal information" className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-      <h2 className="text-xl font-semibold">Personal Information</h2>
-      <p className="mt-1 text-sm text-muted-foreground">Tell us who this order is for.</p>
+    <section
+      role="region"
+      aria-label="Personal information"
+      className="rounded-2xl border border-border bg-card p-6 shadow-sm"
+    >
 
-      <form className="mt-6 space-y-4" onSubmit={handleSubmit(onSubmit)} noValidate>
-        <div>
-          <label className="text-sm font-medium" htmlFor="fullName">
-            Full name
-          </label>
-          <input
-            id="fullName"
-            className={fieldClassName}
-            aria-invalid={errors.fullName ? "true" : "false"}
-            aria-describedby={errors.fullName ? "fullName-error" : undefined}
-            {...register("fullName")}
-          />
-          <FormError id="fullName-error" message={errors.fullName?.message} />
-        </div>
+      <form className="mt-6 space-y-4" onSubmit={handleSubmit(onSubmit)}>
+        <FieldGroup>
+          <FieldSet>
+            <FieldLegend>Personal Information</FieldLegend>
+            <FieldDescription>Tell us who this order is for.</FieldDescription>
+            <FieldGroup>
+              {/* Full name */}
+              <Controller
+                control={control}
+                name="fullName"
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="fullName">Full name</FieldLabel>
+                    <Input
+                      {...field}
+                      id="fullName"
+                      aria-invalid={fieldState.invalid}
+                      placeholder="Full name"
+                    />
+                    {fieldState.error && (
+                      <FieldError
+                        id="fullName-error"
+                        errors={[fieldState.error]}
+                      />
+                    )}
+                  </Field>
+                )}
+              />
 
-        <div>
-          <label className="text-sm font-medium" htmlFor="email">
-            Email
-          </label>
-          <input
-            id="email"
-            type="email"
-            className={fieldClassName}
-            aria-invalid={errors.email ? "true" : "false"}
-            aria-describedby={errors.email ? "email-error" : undefined}
-            {...register("email")}
-          />
-          <FormError id="email-error" message={errors.email?.message} />
-        </div>
+              <Controller
+                control={control}
+                name="email"
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="email">Email</FieldLabel>
+                    <Input
+                      {...field}
+                      id="email"
+                      type="email"
+                      aria-invalid={fieldState.invalid}
+                      placeholder="Email"
+                    />
+                    {fieldState.error && (
+                      <FieldError
+                        id="email-error"
+                        errors={[fieldState.error]}
+                      />
+                    )}
+                  </Field>
+                )}
+              />
 
-        <div>
-          <label className="text-sm font-medium" htmlFor="phoneNumber">
-            Phone number
-          </label>
-          <input
-            id="phoneNumber"
-            type="tel"
-            className={fieldClassName}
-            aria-invalid={errors.phoneNumber ? "true" : "false"}
-            aria-describedby={errors.phoneNumber ? "phoneNumber-error" : undefined}
-            {...register("phoneNumber")}
-          />
-          <FormError id="phoneNumber-error" message={errors.phoneNumber?.message} />
-        </div>
+              <Controller
+                control={control}
+                name="phoneNumber"
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="phoneNumber">Phone Number</FieldLabel>
+                    <Input
+                      {...field}
+                      id="phoneNumber"
+                      type="tel"
+                      aria-invalid={fieldState.invalid}
+                      placeholder="Phone Number"
+                    />
+                    {fieldState.error && (
+                      <FieldError
+                        id="phoneNumber-error"
+                        errors={[fieldState.error]}
+                      />
+                    )}
+                  </Field>
+                )}
+              />
+            </FieldGroup>
+          </FieldSet>
+        </FieldGroup>
 
         <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-between">
-          <Button type="button" variant="outline" className="min-h-12 w-full sm:w-auto" onClick={() => goToStep(1)}>
+          <Button
+            type="button"
+            variant="outline"
+            className="min-h-12 w-full sm:w-auto"
+            onClick={() => goToStep(1)}
+          >
             Back
           </Button>
           <Button type="submit" className="min-h-12 w-full sm:w-auto">
