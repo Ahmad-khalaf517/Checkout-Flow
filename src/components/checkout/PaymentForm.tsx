@@ -152,7 +152,7 @@ export function PaymentForm() {
             }}
           />
           <Tooltip>
-            <TooltipTrigger>
+            <TooltipTrigger asChild>
               <Button
                 onClick={() => {
                   const generatedCard = generateLuhnId(16)
@@ -163,7 +163,7 @@ export function PaymentForm() {
                 className="h-12 px-2 mt-1 bg-amber-400 text-white"
               >
                 <CreditCard className="h-4 w-4 text-blue-900" /> Generate 
-              <Sparkles className="h-3.5 w-3.5 fill-amber-400 text-blue-900" />
+                <Sparkles className="h-3.5 w-3.5 fill-amber-400 text-blue-900" />
 
               </Button>
             </TooltipTrigger>
